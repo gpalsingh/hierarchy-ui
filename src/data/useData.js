@@ -1,5 +1,6 @@
 import { useEffect, useReducer } from "react";
 
+// Used to create colors for each section
 const getRandomColor = () => {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -347,16 +348,36 @@ const changeTeam = (state, payload) => {
   const { memberId, newSectionId } = payload;
   const newState = cloneState(state);
   const memberData = newState.employees[memberId];
-  const [prevSection, newSection] = [memberData.section, newSectionId].map(sectionId => {
+  const prevSectionId = memberData.section;
+  const [prevSection, newSection] = [prevSectionId, newSectionId].map(sectionId => {
     return newState.sections[sectionId];
   });
 
-  // Remove entry from previous team
-  const prevMemberIndex = prevSection.members.findIndex(id => id === memberId);
-  prevSection.members.splice(prevMemberIndex, 1);
+  // Team must have at least one team lead and team member
+  if (prevSection.members.length < 2) {
+    // Add open position in place
+    const [newEmployeeId, newEmployee] = createEmployeeSlot(newState);
+    prevSection.members[0] = newEmployeeId;
+    newEmployee.section = prevSectionId;
+    newState.employees[newEmployeeId] = newEmployee;
+  } else {
+    // Remove entry from previous team
+    const prevMemberIndex = prevSection.members.findIndex(id => id === memberId);
+    prevSection.members.splice(prevMemberIndex, 1);
+  }
 
-  // Add entry to new team
-  newSection.members.push(memberId);
+  /**
+   * Add entry to new team
+   * If there is an open position fill it first
+   */
+  const openPositionIndex = newSection.members.findIndex(id => newState.employees[id].isVacant);
+  if (openPositionIndex >= 0) {
+    const openPositionId = newSection.members[openPositionIndex];
+    newSection.members[openPositionIndex] = memberId;
+    delete newState.employees[openPositionId];
+  } else {
+    newSection.members.push(memberId);
+  }
 
   // Update employee
   newState.employees[memberId].section = newSectionId;
@@ -433,7 +454,7 @@ const addNewTeam = (state, payload) => {
 
   // Add entry to parent section
   const section = newState.sections[sectionId];
-  section.subSections.push(teamSectionId);
+  section.subSections.unshift(teamSectionId);
 
   // Create team member section
   const [memberId, memberData] = createEmployeeSlot(newState);
@@ -501,6 +522,28 @@ const parseInitialState = (payload) => {
   return payload;
 };
 
+const updateSectionName = (state, payload) => {
+  const { sectionId, newName } = payload;
+
+  const newState = cloneState(state);
+
+  const sectionsAffected = [sectionId];
+  const section = newState.sections[sectionId];
+
+  // Lead and member sections should have same label
+  if (section.role === 'lead') {
+    sectionsAffected.push(section.subSections[0]);
+  } else if (section.role === 'member') {
+    sectionsAffected.push(section.parent);
+  }
+
+  sectionsAffected.forEach(secId => {
+    newState.sections[secId].label = newName;
+  });
+
+  return newState;
+};
+
 const reducer = (state, action) => {
   switch (action.type) {
     case 'ADD_MEMBER':
@@ -517,6 +560,8 @@ const reducer = (state, action) => {
       return promoteEmployee(state, action.payload);
     case 'INITIALIZE':
       return parseInitialState(action.payload);
+    case 'UPDATE_SECTION_NAME':
+      return updateSectionName(state, action.payload);
     default:
       throw new Error('Unknown action');
   }

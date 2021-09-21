@@ -1,64 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
-import Form from 'react-bootstrap/Form';
-
-const TeamDetails = ({ isShown, onHide, handleDetails }) => {
-  const [teamName, setTeamName] = useState('');
-
-  const handleNameChange = (event) => {
-    const val = event.target.value;
-    if (val) {
-      setTeamName(val.trimStart());
-    } else {
-      setTeamName('');
-    }
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    handleDetails(teamName);
-  };
-
-  // Clear team name when modal closes
-  useEffect(() => {
-    if (teamName && (!isShown)) {
-      setTeamName('');
-    }
-  }, [isShown, teamName]);
-
-  return <Modal show={isShown} onHide={onHide}>
-    <Modal.Header closeButton>
-      <Modal.Title>Team Details</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Name:</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Team Name"
-            value={teamName}
-            onChange={handleNameChange}
-          />
-        </Form.Group>
-      </Form>
-    </Modal.Body>
-    <Modal.Footer>
-      <Button variant="secondary" onClick={onHide}>
-        Close
-      </Button>
-      <Button
-        variant="primary"
-        onClick={handleSubmit}
-        disabled={!teamName}
-        type="submit"
-      >
-        Create
-      </Button>
-    </Modal.Footer>
-  </Modal>
-};
+import SectionDetailsModal from './SectionDetailsModal';
 
 const AddTeam = ({ sectionId, dispatch, addToast }) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -86,7 +28,7 @@ const AddTeam = ({ sectionId, dispatch, addToast }) => {
   };
 
   return <>
-    <TeamDetails
+    <SectionDetailsModal
       isShown={showDetailsModal}
       onHide={handleModalClose}
       handleDetails={handleTeamDetails}

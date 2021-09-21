@@ -53,6 +53,7 @@ const Main = () => {
       sections={sections}
       isShown={![null, undefined].includes(selectedEmployeeDetails)}
       addToast={setToastContent}
+      roles={roles}
     />
   </>;
 };
