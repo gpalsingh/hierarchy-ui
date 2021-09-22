@@ -43,6 +43,7 @@ const EmployeeTitle = ({ sections, employees, roles, employeeId, dispatch, addTo
       handleDetails={handleNewSectionName}
       sectionType={sectionType}
       initialValue={sectionData.label}
+      invalidTerms={Object.values(sections).map(section => section.label).filter(Boolean)}
     />
     <div className="mb-4">
       {role.prefix + ' '}

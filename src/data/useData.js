@@ -133,7 +133,7 @@ const defaultSections = {
     "subSections": []
   },
   "10": {
-    "label": "First team",
+    "label": "Second team",
     "color": "#B1347E",
     "members": [
       14
@@ -145,7 +145,7 @@ const defaultSections = {
     ]
   },
   "11": {
-    "label": "First team",
+    "label": "Second team",
     "members": [
       15
     ],

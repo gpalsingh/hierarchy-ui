@@ -46,6 +46,7 @@ const Actions = ({ dispatch, employeeId, closeDetails, sections, employees, ...p
       <AddTeam
         sectionId={sectionId}
         dispatch={dispatch}
+        sections={sections}
         {...props}
       />
     }

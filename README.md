@@ -7,11 +7,12 @@ A hierarchical UI for a company which shows all the employees
 - **Add member**: Select a Team Lead or Team Member card and use the "Add Member" button in the details panel
 - **Change team**: Select a Team Member card and use the "Change Team" dropdown
 - **Remove member**: Select a Team Member card and use the "Remove member" button
-- **Update employee**: Select any employe card and enter the employee details in the form
+- **Update employee**: Select any employees card and enter the employee details in the form
 - **Create team**:Select a Department Card (HR, Design, etc.) and use the "Add Team" button
 - **Edit team name**: Select any team card and click on the team name on the top of the Details panel. Department names can also be edited.
 - **Filter employees**: Use the search bar in the navbar bar to search for any employee
 - **Promotions**: Select any employee card and use the "Promote" button
+- **Unique names**: All teams are required to have unique names. A form with duplicate team name will not submit
 
 ## Available Scripts
 

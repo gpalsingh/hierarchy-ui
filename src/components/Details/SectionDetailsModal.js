@@ -7,9 +7,18 @@ import Form from 'react-bootstrap/Form';
  * Modal used to enter section name
  * Used both when creating new team and when editing section name
  */
-const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, initialValue }) => {
+const SectionDetailsModal = ({
+  isShown,
+  onHide,
+  handleDetails,
+  sectionType,
+  initialValue,
+  invalidTerms,
+}) => {
   const [sectionName, setSectionName] = useState(initialValue || '');
   const [hasEdited, setHasEdited] = useState(false);
+  const [isDuplicateName, setIsDuplicateName] = useState(false);
+  const isDisabled = !hasEdited || !sectionName || isDuplicateName;
 
   const handleNameChange = (event) => {
     const val = event.target.value;
@@ -27,6 +36,10 @@ const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, init
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (isDisabled) {
+      return;
+    }
     handleDetails(sectionName);
   };
 
@@ -36,6 +49,18 @@ const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, init
       setSectionName(initialValue || '');
     }
   }, [initialValue, isShown, sectionName]);
+
+  // Disable save if team name already exists
+  useEffect(() => {
+    if (!invalidTerms) {
+      return;
+    }
+
+    const canSave = invalidTerms.some(term => sectionName.toLowerCase() === term.toLowerCase());
+    if (canSave !== isDuplicateName) {
+      setIsDuplicateName(canSave);
+    }
+  }, [invalidTerms, isDuplicateName, sectionName])
 
   const handleClose = () => {
     setHasEdited(false);
@@ -56,9 +81,14 @@ const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, init
             placeholder={`${sectionType || 'Team'} Name`}
             value={sectionName}
             onChange={handleNameChange}
-            isInvalid={hasEdited && !sectionName}
-            isValid={hasEdited && sectionName}
+            isInvalid={hasEdited && (!sectionName || isDuplicateName)}
+            isValid={hasEdited && sectionName && !isDuplicateName}
           />
+          {hasEdited && isDuplicateName &&
+            <Form.Control.Feedback type="invalid">
+              A {sectionType || 'Team'} with this name already exists
+            </Form.Control.Feedback>
+          }
         </Form.Group>
       </Form>
     </Modal.Body>
@@ -69,7 +99,7 @@ const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, init
       <Button
         variant="primary"
         onClick={handleSubmit}
-        disabled={!hasEdited || !sectionName}
+        disabled={isDisabled}
         type="submit"
       >
         Create

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import SectionDetailsModal from './SectionDetailsModal';
 
-const AddTeam = ({ sectionId, dispatch, addToast }) => {
+const AddTeam = ({ sectionId, dispatch, addToast, sections }) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   const handleClick = () => {
@@ -32,6 +32,7 @@ const AddTeam = ({ sectionId, dispatch, addToast }) => {
       isShown={showDetailsModal}
       onHide={handleModalClose}
       handleDetails={handleTeamDetails}
+      invalidTerms={Object.values(sections).map(section => section.label).filter(Boolean)}
     />
     <Button
       variant="success"
