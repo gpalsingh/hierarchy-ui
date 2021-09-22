@@ -3,7 +3,7 @@ import Card from 'react-bootstrap/Card';
 const EmployeeCard = ({ data, title, handleClick, isLast, color, isMemberRole }) => {
   /**
    * Member cards show as light colored versions of team leader cards
-   * Vacant positions show as even lighter versions
+   * Vacant positions show as even lighter versions and have dotted borders
    */
   const styles = {
     backgroundColor: `${color}${data.isVacant ? '1a' : (isMemberRole ? '80' : '')}`,

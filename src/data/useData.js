@@ -309,6 +309,7 @@ const defaultEmployees = {
   }
 };
 
+// Modifying the state is left to the caller function to keep function idempotent
 const createEmployeeSlot = (state) => {
   let i = 1;
   while (state.employees[i]) {
@@ -331,6 +332,7 @@ const addMember = (state, payload) => {
 
   const newState = cloneState(state);
 
+  // Add employee to employees list
   const [memberId, memberData] = createEmployeeSlot(state);
   newState.employees[memberId] = memberData;
   memberData.section = sectionId;
@@ -338,6 +340,7 @@ const addMember = (state, payload) => {
   const membersList = newState?.sections[sectionId]?.members;
 
   if (membersList) {
+    // Add member to the top of the list for better discovery
     membersList.unshift(memberId);
   }
 
@@ -355,13 +358,13 @@ const changeTeam = (state, payload) => {
 
   // Team must have at least one team lead and team member
   if (prevSection.members.length < 2) {
-    // Add open position in place
+    // Show open position in place of the employee that just got moved
     const [newEmployeeId, newEmployee] = createEmployeeSlot(newState);
     prevSection.members[0] = newEmployeeId;
     newEmployee.section = prevSectionId;
     newState.employees[newEmployeeId] = newEmployee;
   } else {
-    // Remove entry from previous team
+    // Since there  are other members left we can just remove the previous entry
     const prevMemberIndex = prevSection.members.findIndex(id => id === memberId);
     prevSection.members.splice(prevMemberIndex, 1);
   }
@@ -394,13 +397,13 @@ const removeTeamMember = (state, payload) => {
   const section = newState.sections[member.section];
   // Team must have at least one team lead and team member
   if (section.members.length < 2) {
-    // Replace with vacant position
+    // Show open position in place of the employee that was removed
     newState.employees[memberId] = {
       section: newState.employees[memberId].section,
       isVacant: true,
     };
   } else {
-    // Remove employee
+    // Since there  are other members left we can just remove the previous entry
     const memberIndex = section.members.findIndex(id => id === memberId);
     section.members.splice(memberIndex, 1);
     delete newState.employees[memberId];
@@ -414,11 +417,11 @@ const updateEmployeeDetails = (state, payload) => {
   const newState = cloneState(state);
 
   newState.employees[id] = {
-    ...newState.employees[id],
+    ...newState.employees[id], // Maintain section info
     label,
     phone,
     email,
-    isVacant: false,
+    isVacant: false, // Handles the case when editing open position
   };
 
   return newState;
@@ -515,11 +518,16 @@ const promoteEmployee = (state, payload) => {
 };
 
 const parseInitialState = (payload) => {
-  if (typeof payload === 'string') {
-    return JSON.parse(payload);
+  if (!payload) {
+    // First time running the app or the user cleared the app data
+    return {
+      roles: defaultRoles,
+      sections: defaultSections,
+      employees: defaultEmployees,
+    };
   }
 
-  return payload;
+  return JSON.parse(payload);
 };
 
 const updateSectionName = (state, payload) => {
@@ -567,6 +575,31 @@ const reducer = (state, action) => {
   }
 };
 
+/**
+ * Each section (department, team, etc.) is stored separately from the
+ * employees list for faster lookups
+ *
+ * Section schema:
+ * The ID is fixed to be "root" for the root node
+ * [Section ID]: {
+ *   "label": Section name,
+ *   "color": Color of the section used for background and card,
+ *   "members": List of employee IDs that belong to this section,
+ *   "role": Specifies the role of the employees,
+ *   "parent": Parent section,
+ *   "subSections": List of sections that fall under this section
+ * }
+ *
+ * Employee schema:
+ * [Employee ID]: {
+ *   "label": Employee name,
+ *   "section": The ID of the section this employee belongs to,
+ *   "phone": phone number,
+ *   "email": email,
+ *   isVacant: true if position is vacant. Open positions are just
+ *             employee entries with "isVacant" as "true"
+ * }
+ */
 const useData = () => {
   const [treeState, dispatch] = useReducer(reducer, null);
 
@@ -576,11 +609,7 @@ const useData = () => {
       const savedState = localStorage.getItem('TREE_STATE');
       dispatch({
         type: 'INITIALIZE',
-        payload: savedState || {
-          roles: defaultRoles,
-          sections: defaultSections,
-          employees: defaultEmployees,
-        },
+        payload: savedState,
       })
     } else {
       // Save latest state

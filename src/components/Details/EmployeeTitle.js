@@ -7,6 +7,9 @@ const PencilIcon = () => {
   </svg>;
 };
 
+/**
+ * Component to show employee title with the ability to change section name
+ */
 const EmployeeTitle = ({ sections, employees, roles, employeeId, dispatch, addToast }) => {
   const [isEditing, setIsEditing] = useState(false);
   const employee = employees[employeeId];

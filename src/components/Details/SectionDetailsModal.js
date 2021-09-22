@@ -3,6 +3,10 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 
+/**
+ * Modal used to enter section name
+ * Used both when creating new team and when editing section name
+ */
 const SectionDetailsModal = ({ isShown, onHide, handleDetails, sectionType, initialValue }) => {
   const [sectionName, setSectionName] = useState(initialValue || '');
   const [hasEdited, setHasEdited] = useState(false);

@@ -16,6 +16,7 @@ const Section = ({ sectionId, ...props }) => {
    * Team lead and member sections should appear to be a single section
    */
   if (isMemberRole) {
+    // Member section has similar colors to team lead section
     const parentSection = sections[sectionData.parent];
     backgroundColor = parentSection.color;
     // No top margin or border radius

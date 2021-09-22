@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-const Warning = ({ isShown, handleClose, handleRemoveConfirmed }) => {
+const ConfirmRemoveWarning = ({ isShown, handleClose, handleRemoveConfirmed }) => {
   return <Modal show={isShown} onHide={handleClose}>
     <Modal.Header closeButton>
       <Modal.Title>Confirm Remove</Modal.Title>
@@ -45,7 +45,7 @@ const RemoveMember = ({ memberId, dispatch, closeDetails, addToast }) => {
     >
       Remove employee
     </Button>
-    <Warning
+    <ConfirmRemoveWarning
       isShown={isShowingWarning}
       handleClose={() => setIsShowingWarning(false)}
       handleRemoveConfirmed={handleRemoveConfirmed}

@@ -4,6 +4,9 @@ import Promote from './Promote';
 import AddMember from './AddMember';
 import RemoveMember from './RemoveMember';
 
+/**
+ * Shows list of possible actions for a given employee
+ */
 const Actions = ({ dispatch, employeeId, closeDetails, sections, employees, ...props }) => {
   const employee = employees[employeeId];
   const sectionId = employee.section;
